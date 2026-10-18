@@ -46,7 +46,7 @@ uv run python scripts/reproduce.py RUN_ID
 ```
 Scenarijus atsisiunčia run'o provenance.json, išpakuoja to meto Git commit į laikiną
 katalogą, per DVC gauna tos versijos duomenis, atkuria parametrus ir vykdo visus tris
-stage'us. Dabartinis darbo katalogas ir jo parametrai neperrašomi.
+stage'us su istoriniame uv.lock užrakinta aplinka. Dabartinis darbo katalogas ir jo parametrai neperrašomi.
 Naujas run'as susiejamas `reproduces` žyma; metrikos palyginamos, laikas matuojamas.
 
 ## Šaltiniai

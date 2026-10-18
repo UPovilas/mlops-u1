@@ -19,7 +19,7 @@ def main():
     experiment = os.environ.get("MLFLOW_EXPERIMENT_NAME", "wine-u1")
     mlflow.set_experiment(experiment)
     train = pd.read_csv(ROOT / "data/processed/train.csv")
-    x, y = train.drop(columns="target"), train["target"]
+    x, y = train.drop(columns="target").astype("float64"), train["target"]
     provenance = {
         "git_commit": commit,
         "params": cfg,
@@ -40,6 +40,8 @@ def main():
         joblib.dump(model, ROOT / "models/model.pkl")
         mlflow.sklearn.log_model(
             model, name="model", input_example=x.head(3),
+            # This tree was just trained here, not loaded from an external model file.
+            skops_trusted_types=["sklearn.tree._tree.Tree"],
             pip_requirements=[f"scikit-learn=={sklearn.__version__}", f"pandas=={pd.__version__}", f"joblib=={joblib.__version__}"],
         )
         mlflow.log_dict(provenance, "provenance.json")

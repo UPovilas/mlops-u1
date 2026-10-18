@@ -3,6 +3,7 @@ import argparse
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -43,8 +44,14 @@ with tempfile.TemporaryDirectory(prefix="wine-u1-reproduce-") as directory:
     (work / "params.yaml").write_text(yaml.safe_dump(provenance["params"], sort_keys=False))
     env = dict(os.environ, SOURCE_GIT_COMMIT=commit, REPRODUCES_RUN_ID=args.run_id,
                MLFLOW_EXPERIMENT_NAME=mlflow.get_experiment(original.info.experiment_id).name)
+    # Use the historical uv.lock, not whichever packages happen to be installed today.
+    env.pop("VIRTUAL_ENV", None)
+    env.pop("UV_PROJECT_ENVIRONMENT", None)
+    uv = shutil.which("uv")
+    if not uv:
+        raise SystemExit("Historical environment restoration requires uv.")
     for stage in ["prepare", "train", "evaluate"]:
-        subprocess.run([sys.executable, f"src/{stage}.py"], cwd=work, env=env, check=True)
+        subprocess.run([uv, "run", "--project", str(work), "--frozen", "python", f"src/{stage}.py"], cwd=work, env=env, check=True)
     reproduced = json.loads((work / "metrics.json").read_text())
     new_run = json.loads((work / "models/run.json").read_text())["run_id"]
     for key, value in reproduced.items():
