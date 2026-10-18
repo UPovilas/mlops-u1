@@ -1,0 +1,39 @@
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+      - src/common.py
+      - src/prepare.py
+      - data/raw/wine.csv
+    params:
+      - split.test_size
+      - split.random_state
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/common.py
+      - src/train.py
+      - data/raw/wine.csv
+      - data/processed/train.csv
+    params:
+      - train.n_estimators
+      - train.max_depth
+      - train.random_state
+    outs:
+      - models/model.pkl
+      - models/run.json:
+          cache: false
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/common.py
+      - src/evaluate.py
+      - data/processed/test.csv
+      - models/model.pkl
+      - models/run.json
+    metrics:
+      - metrics.json:
+          cache: false

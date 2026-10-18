@@ -1,0 +1,14 @@
+[project]
+name = "wine-mlops-u1"
+version = "0.1.0"
+description = "U1: reproducible Wine classification experiments with DVC and MLflow"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "dvc==3.67.1",
+    "joblib==1.6.0",
+    "mlflow==3.15.2",
+    "pandas>=2.2,<3",
+    "pyyaml>=6.0,<7",
+    "scikit-learn==1.9.1",
+]
+

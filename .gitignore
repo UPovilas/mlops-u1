@@ -1,0 +1,13 @@
+.venv/
+.state/
+.dvc/cache/
+.dvc/tmp/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+data/raw/*.csv
+data/processed/
+models/*.pkl
+*.log
+
