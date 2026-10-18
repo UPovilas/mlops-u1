@@ -7,6 +7,19 @@ Random Forest, CPU; vertinamas atkartojamas eksperimentų srautas.
 Pradinis vietinis etapas. Kubernetes, GHCR, Trivy ir galutinis U1 pateikimas dar ruošiami.
 Mokymosi gidas: [docs/mokymasis.md](docs/mokymasis.md).
 
+Patikrinta 2026-10-18: prepare → train → evaluate; trys MLflow eksperimentai;
+istorinio run'o atkūrimas su jo užrakinta aplinka per **33.084 s**, nekeičiant dabartinių
+darbo failų; MLflow saugomo modelio atsisiuntimas ir predict. Kai niekas nepasikeitė,
+`dvc repro` praleido visus tris stage'us. Tai vietinio etapo, o ne galutinio U1, patikros.
+
+## Pirmas tavo pratimas
+1. MLflow UI atidaryk wine-u1 eksperimentą; palygink n10-d2 ir n100-dNone run'us.
+2. Skaityk params.yaml, src/prepare.py, src/train.py, src/evaluate.py ir dvc.yaml.
+3. Pakeisk params.yaml n_estimators iš 100 į 30.
+4. Terminale nustatyk MLFLOW_TRACKING_URI ir paleisk `uv run dvc repro`.
+5. Stebėk: prepare praleidžiamas; train ir evaluate persileidžia; MLflow yra naujas run'as.
+6. Grąžink 100 ir dar kartą paleisk dvc repro.
+
 ## Aplinka
 Reikia Python 3.12, uv, Git. Aplinką užrakina uv.lock.
 

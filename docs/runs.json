@@ -1,0 +1,50 @@
+[
+  {
+    "experiment": "wine-u1",
+    "git_commit": "cf98b9ba281e0681d100fa27213328d3712d717f",
+    "run_id": "c38c0643e0e34e94bfbd8e95018a915b",
+    "train": {
+      "n_estimators": 10,
+      "max_depth": 2,
+      "random_state": 42
+    },
+    "metrics": {
+      "accuracy": 0.9722222222222222,
+      "f1_weighted": 0.9722633744855966,
+      "precision_weighted": 0.9743589743589745,
+      "recall_weighted": 0.9722222222222222
+    }
+  },
+  {
+    "experiment": "wine-u1",
+    "git_commit": "cf98b9ba281e0681d100fa27213328d3712d717f",
+    "run_id": "b639296b72244361afda4f32e2a6101d",
+    "train": {
+      "n_estimators": 50,
+      "max_depth": 4,
+      "random_state": 42
+    },
+    "metrics": {
+      "accuracy": 1.0,
+      "f1_weighted": 1.0,
+      "precision_weighted": 1.0,
+      "recall_weighted": 1.0
+    }
+  },
+  {
+    "experiment": "wine-u1",
+    "git_commit": "cf98b9ba281e0681d100fa27213328d3712d717f",
+    "run_id": "64c80cf25f9c4f03b73f2a12a7df6316",
+    "train": {
+      "n_estimators": 100,
+      "max_depth": null,
+      "random_state": 42
+    },
+    "metrics": {
+      "accuracy": 1.0,
+      "f1_weighted": 1.0,
+      "precision_weighted": 1.0,
+      "recall_weighted": 1.0
+    }
+  }
+]

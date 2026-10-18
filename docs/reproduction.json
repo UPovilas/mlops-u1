@@ -1,0 +1,9 @@
+{
+  "original_run": "c38c0643e0e34e94bfbd8e95018a915b",
+  "reproduced_run": "a60ca1a8e668409a8110ea08e9b39c33",
+  "git_commit": "cf98b9ba281e0681d100fa27213328d3712d717f",
+  "data_sha256": "cd80158fad3d1e203d61dae42242620b02dd5f918e637b5f08381e39e7cf5204",
+  "seconds": 33.084,
+  "metrics_match": true,
+  "under_120_seconds": true
+}

@@ -1,4 +1,4 @@
-# Reikalavimai — v1.0
+# Reikalavimai — v1.1
 
 ## Problema
 Pagal 13 cheminės analizės požymių klasifikuoti vyną į vieną iš trijų klasių.
@@ -25,7 +25,15 @@ https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_wine.htm
 
 Tai tikslai ir patikros, o ne teiginys, kad visi matavimai jau atlikti.
 
+## Pirmo vietinio etapo matavimai (2026-10-18)
+- Trys pateikiami run'ai: docs/runs.json; visi užbaigti ir turi Git/data žymas.
+- Istorinio run'o atkūrimas su jo uv.lock: 33.084 s; visos keturios metrikos sutapo.
+- Atkūrimas nepakeitė dabartinių params.yaml, dvc.lock, metrics.json ar models/run.json.
+- MLflow modelio atsisiuntimas ir predict patikrinti; rezultatas sutapo su run'o accuracy.
+- Kubernetes išlikimo KPI dar neišmatuotas. Vietinis MLflow nepakeičia U1-R4.
+
 ## Keitimo istorija
 | Versija | Data | Pakeitimas |
 |---|---|---|
 | 1.0 | 2026-10-18 | Problema, FR, pradinis reikalavimų rinkinys. |
+| 1.1 | 2026-10-18 | Užfiksuoti vietinio pipeline'o, atsekamumo ir reprodukcijos matavimai; atskirtos neatliktos patikros. |

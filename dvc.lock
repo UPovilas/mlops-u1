@@ -1,0 +1,91 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+    - path: data/raw/wine.csv
+      hash: md5
+      md5: 2925c4a8cd201c79d97d3d283429ef23
+      size: 12261
+    - path: src/common.py
+      hash: md5
+      md5: 401f0298cdc2543c260d3c227cbd4518
+      size: 1336
+    - path: src/prepare.py
+      hash: md5
+      md5: 1bc39f33a32a17bfbf7cfc5b3cb4867e
+      size: 642
+    params:
+      params.yaml:
+        split.random_state: 42
+        split.test_size: 0.2
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: f9747882339c7a11ad01c46e43bd9007
+      size: 2615
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 5ac769d42b290244ccdd91b8a01dddca
+      size: 9823
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 5ac769d42b290244ccdd91b8a01dddca
+      size: 9823
+    - path: data/raw/wine.csv
+      hash: md5
+      md5: 2925c4a8cd201c79d97d3d283429ef23
+      size: 12261
+    - path: src/common.py
+      hash: md5
+      md5: 401f0298cdc2543c260d3c227cbd4518
+      size: 1336
+    - path: src/train.py
+      hash: md5
+      md5: 57332674561674bf71da4122b938dfae
+      size: 2411
+    params:
+      params.yaml:
+        train.max_depth:
+        train.n_estimators: 100
+        train.random_state: 42
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: 86c6d9c4ad07c175d895d83af3ba9850
+      size: 212017
+    - path: models/run.json
+      hash: md5
+      md5: 06c29422336dd2a75d2a878ff28117dd
+      size: 138
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: f9747882339c7a11ad01c46e43bd9007
+      size: 2615
+    - path: models/model.pkl
+      hash: md5
+      md5: 86c6d9c4ad07c175d895d83af3ba9850
+      size: 212017
+    - path: models/run.json
+      hash: md5
+      md5: 06c29422336dd2a75d2a878ff28117dd
+      size: 138
+    - path: src/common.py
+      hash: md5
+      md5: 401f0298cdc2543c260d3c227cbd4518
+      size: 1336
+    - path: src/evaluate.py
+      hash: md5
+      md5: d2f1feb865cf01de1f6f79615d1a7ce8
+      size: 1275
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: b013c10c869a7a81a382081b5a6c630c
+      size: 99
