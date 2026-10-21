@@ -16,9 +16,9 @@ Duomenys: scikit-learn Wine, 178 įrašai. Mokymas CPU, Random Forest.
 
 | ID | KPI | Išmatuota |
 |---|---|---|
-| NFR-1 | Istorinio run'o atkūrimas <120 s, kai Python paketai yra vietiniame uv cache. | 32.685 s. |
+| NFR-1 | Istorinio run'o atkūrimas <120 s, kai Python paketai yra vietiniame uv cache. | 28.478 s. |
 | NFR-2 | Visų keturių atkurtų metrikų skirtumas ≤1e-12. | Visos sutapo. |
-| NFR-3 | Vienas Random Forest fit CPU <30 s. | Didžiausia trukmė 0.059 s. |
+| NFR-3 | Vienas Random Forest fit CPU <30 s. | Didžiausia trukmė 0.069 s. |
 | NFR-4 | Perkūrus MLflow ir PostgreSQL Pod'us išlieka run'o metaduomenys ir artefaktų SHA256. | PASS. |
 | NFR-5 | 100% pateikiamų run'ų turi parametrus, Git bazę, duomenų ir kodo SHA256. | Patikrinti 3 run'ai. |
 | NFR-6 | Python 3.12, priklausomybės iš uv.lock, paleidimas atskiroje aplinkoje. | Fresh-start patikra PASS. |

@@ -4,9 +4,9 @@
   "train_rows": 142,
   "test_rows": 36,
   "run_ids": [
-    "010e687f4c9146e9bd9ccd2b76e30657",
-    "91c1bb466da1431bb1a7e03fe9ae2dad",
-    "ef6cb5a6323f4ed6af87ee604b0426d2"
+    "3c23ac1421744843b82c0e495aa80f7b",
+    "27dfc83771ef450aa02531938dc5fc0f",
+    "52e74e2cfa604700abe59474fc670a40"
   ],
   "three_parameter_settings": true,
   "downloaded_mlflow_model_matches_local_predictions": true,
@@ -16,6 +16,6 @@
   "container_accepts_reordered_features": true,
   "container_rejects_missing_features": true,
   "container_runs_nonroot_readonly_without_network": true,
-  "reproduction_seconds": 32.685,
-  "verification_seconds": 45.656
+  "reproduction_seconds": 28.478,
+  "verification_seconds": 43.739
 }

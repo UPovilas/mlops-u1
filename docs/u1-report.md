@@ -11,9 +11,9 @@ Inferencijos Docker vaizdas paleidžiamas ne root vartotoju; įvestis — JSON.
 
 | Patikra | Rezultatas |
 |---|---|
-| Istorinio run'o atkūrimas | 32.685 s; visos keturios metrikos sutapo |
-| Didžiausia modelio fit trukmė | 0.059 s |
-| Atskira projekto kopija ir tuščias DVC remote | 56.914 s; pipeline ir cache atkūrimas PASS |
+| Istorinio run'o atkūrimas | 28.478 s; visos keturios metrikos sutapo |
+| Didžiausia modelio fit trukmė | 0.069 s |
+| Atskira projekto kopija ir tuščias DVC remote | 70.126 s; pipeline ir cache atkūrimas PASS |
 | MLflow ir PostgreSQL Pod'ų perkūrimas | Metaduomenys ir artefaktų hash'ai nepasikeitė |
 | Inferencijos vaizdo dydis | 411.76 MB, arm64 |
 | Trivy | CRITICAL 0, HIGH 44, MEDIUM 58 |
@@ -24,6 +24,10 @@ su vienu web worker'iu. MLflow nepalaiko Pandas 3, todėl aplinkoje naudojama 2.
 Medžio serializavimui aiškiai leidžiamas savo apmokyto sklearn medžio tipas.
 Likę HIGH OS radiniai ir pataisų prieinamumas pateikti security-scan.md.
 
-**Pateikimo būsena.** Techninės patikros atliktos. Darbiniai failai necommitinti;
-viešas repo, galutinis sha-<commit> vaizdas GHCR ir u1-final tag'as priskiriami
-publikavimo metu. Pateikimo failai supakuoti į dist/wine-u1.zip.
+**Laikas.** Darbas užtruko apie 8 valandas.
+
+**Pateikimas.** [GitHub repozitorija](https://github.com/UPovilas/mlops-u1),
+tag'as [u1-final](https://github.com/UPovilas/mlops-u1/tree/u1-final).
+GHCR vaizdas: `ghcr.io/upovilas/wine-u1:sha-00962be3a4b9`.
+Registry digest: `sha256:e94b10ff14da9ce3d4ca3dbbb3e45e6a4bb3d03efbec0081a666cf584fe0064f`.
+Vaizdo kodo commit'as: [00962be3a4b9ba1f190c95079b74315d6daa891c](https://github.com/UPovilas/mlops-u1/commit/00962be3a4b9ba1f190c95079b74315d6daa891c).

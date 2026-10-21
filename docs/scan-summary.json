@@ -1,12 +1,12 @@
 {
-  "image": "wine-u1-inference:worktree-c3e2b8057da8",
-  "image_id": "sha256:db877cb80c05bdfa4ba82268503c5e5e445067682794e4995750147e62590a40",
-  "created_at": "2026-10-19T09:42:01.233887+03:00",
+  "image": "wine-u1-inference:sha-00962be3a4b9",
+  "image_id": "sha256:9fba30fd0bf5e0088180526bd1cddd4b9fe571bc66555640f18d3faeddd3b0af",
+  "created_at": "2026-10-21T22:39:27.919215+03:00",
   "severity_counts": {
     "LOW": 61,
     "HIGH": 44,
     "MEDIUM": 58,
-    "UNKNOWN": 1
+    "UNKNOWN": 2
   },
   "critical_gate_passed": true
 }

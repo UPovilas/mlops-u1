@@ -1,11 +1,11 @@
 {
-  "original_run": "010e687f4c9146e9bd9ccd2b76e30657",
-  "reproduced_run": "ba3a0ebd88fb4c509b08e8dc51fb6327",
-  "git_commit": "5c9a6333a4aec092ae61e54eb97d829252dd6f8b",
-  "source_sha256": "b8fa8cc724d4dc402dc0135d48b7ff6e15fb2c3d7bd45136e4e54b736da71967",
+  "original_run": "3c23ac1421744843b82c0e495aa80f7b",
+  "reproduced_run": "6ff1fb8850224ba9876505209a8c0702",
+  "git_commit": "00962be3a4b9ba1f190c95079b74315d6daa891c",
+  "source_sha256": "c28ba29199456f3403633fd93f3b11e655a4de4b29974be55f56156ca2b11f10",
   "tracking_uri": "http://127.0.0.1:5002",
   "data_sha256": "cd80158fad3d1e203d61dae42242620b02dd5f918e637b5f08381e39e7cf5204",
-  "seconds": 32.685,
+  "seconds": 28.478,
   "metrics_match": true,
   "under_120_seconds": true
 }

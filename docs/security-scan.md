@@ -1,6 +1,6 @@
 # Trivy skenavimas
 
-Vaizdas: `wine-u1-inference:worktree-c3e2b8057da8`. Skenuota: 2026-10-19T09:42:01.233887+03:00.
+Vaizdas: `wine-u1-inference:sha-00962be3a4b9`. Skenuota: 2026-10-21T22:39:27.919215+03:00.
 Skenavimo ir vaizdo ID sutapimas patikrintas. Visas rezultatas — `trivy.json`.
 
 | Svarba | Radinių skaičius |
@@ -9,7 +9,7 @@ Skenavimo ir vaizdo ID sutapimas patikrintas. Visas rezultatas — `trivy.json`.
 | HIGH | 44 |
 | MEDIUM | 58 |
 | LOW | 61 |
-| UNKNOWN | 1 |
+| UNKNOWN | 2 |
 
 CRITICAL publikavimo patikra: **PASS**.
 Iš HIGH radinių 0 turi skene nurodytą pataisytą versiją.

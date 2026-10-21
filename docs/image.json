@@ -1,12 +1,12 @@
 {
-  "image": "wine-u1-inference:worktree-c3e2b8057da8",
-  "image_id": "sha256:db877cb80c05bdfa4ba82268503c5e5e445067682794e4995750147e62590a40",
+  "image": "wine-u1-inference:sha-00962be3a4b9",
+  "image_id": "sha256:9fba30fd0bf5e0088180526bd1cddd4b9fe571bc66555640f18d3faeddd3b0af",
   "architecture": "arm64",
   "size_bytes": 411763692,
   "user": "10001:10001",
-  "git_commit": "5c9a6333a4aec092ae61e54eb97d829252dd6f8b",
-  "git_dirty": true,
-  "source_sha256": "c3e2b8057da8ffce6c0ee80a4aa1755a4cd88ed1c5fc4da1f046c10ca159376e",
+  "git_commit": "00962be3a4b9ba1f190c95079b74315d6daa891c",
+  "git_dirty": false,
+  "source_sha256": "026551cb2993508c631ec3e42b9785c5c53223a9abd0d9625687e0aa30bf6eef",
   "model_sha256": "223689954b6d8aa42b477046167b5aa0a0c5cb26bbfc43fffb226692d9cef0be",
   "predictions": [
     0,

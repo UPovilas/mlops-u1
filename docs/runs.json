@@ -1,9 +1,9 @@
 [
   {
     "experiment": "wine-u1",
-    "git_commit": "5c9a6333a4aec092ae61e54eb97d829252dd6f8b",
-    "run_id": "010e687f4c9146e9bd9ccd2b76e30657",
-    "source_sha256": "b8fa8cc724d4dc402dc0135d48b7ff6e15fb2c3d7bd45136e4e54b736da71967",
+    "git_commit": "00962be3a4b9ba1f190c95079b74315d6daa891c",
+    "run_id": "3c23ac1421744843b82c0e495aa80f7b",
+    "source_sha256": "c28ba29199456f3403633fd93f3b11e655a4de4b29974be55f56156ca2b11f10",
     "train": {
       "n_estimators": 10,
       "max_depth": 2,
@@ -18,9 +18,9 @@
   },
   {
     "experiment": "wine-u1",
-    "git_commit": "5c9a6333a4aec092ae61e54eb97d829252dd6f8b",
-    "run_id": "91c1bb466da1431bb1a7e03fe9ae2dad",
-    "source_sha256": "77c2e318fb92adf5ec162351096f8681c69e01c42131cffa5e6f22121c35c391",
+    "git_commit": "00962be3a4b9ba1f190c95079b74315d6daa891c",
+    "run_id": "27dfc83771ef450aa02531938dc5fc0f",
+    "source_sha256": "f640467eb3f3125b15dac7f93478423814e19163e76496975b8bf24fd656c9e7",
     "train": {
       "n_estimators": 50,
       "max_depth": 4,
@@ -35,9 +35,9 @@
   },
   {
     "experiment": "wine-u1",
-    "git_commit": "5c9a6333a4aec092ae61e54eb97d829252dd6f8b",
-    "run_id": "ef6cb5a6323f4ed6af87ee604b0426d2",
-    "source_sha256": "c3e2b8057da8ffce6c0ee80a4aa1755a4cd88ed1c5fc4da1f046c10ca159376e",
+    "git_commit": "00962be3a4b9ba1f190c95079b74315d6daa891c",
+    "run_id": "52e74e2cfa604700abe59474fc670a40",
+    "source_sha256": "026551cb2993508c631ec3e42b9785c5c53223a9abd0d9625687e0aa30bf6eef",
     "train": {
       "n_estimators": 100,
       "max_depth": null,
