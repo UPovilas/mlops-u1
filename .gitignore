@@ -10,4 +10,5 @@ data/raw/*.csv
 data/processed/
 models/*.pkl
 *.log
+dist/
 

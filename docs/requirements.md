@@ -1,39 +1,37 @@
 # Reikalavimai — v1.1
 
-## Problema
-Pagal 13 cheminės analizės požymių klasifikuoti vyną į vieną iš trijų klasių.
-Duomenys: scikit-learn Wine, 178 įrašai; pirminis šaltinis UCI Wine.
-https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_wine.html
+Problema: pagal 13 cheminių požymių klasifikuoti vyną į vieną iš trijų klasių.
+Duomenys: scikit-learn Wine, 178 įrašai. Mokymas CPU, Random Forest.
 
 ## Funkciniai reikalavimai
+
 | ID | Reikalavimas | Patikra |
 |---|---|---|
-| FR-1 | Paruošti stratifikuotą train/test padalijimą, apmokyti ir įvertinti modelį. | Trys DVC stage'ai; metrics.json. |
-| FR-2 | MLflow saugoti parametrus, metrikas, modelį, duomenų hash ir Git commit. | Run'o UI ir provenance.json. |
-| FR-3 | Atkurti pasirinktą istorinį run'ą su to meto kodu, duomenimis ir parametrais. | scripts/reproduce.py RUN_ID. |
-| FR-4 | MLflow paleisti savo lokaliame Kubernetes klasteryje. | Run'as matomas per port-forward; artefaktą galima atsisiųsti. |
+| FR-1 | Paruošti train/test, apmokyti ir įvertinti modelį. | Trys DVC stage'ai; metrics.json. |
+| FR-2 | Parametrus, metrikas, modelį ir kilmę siųsti į savo klasterio MLflow. | ≥3 run'ai ir parsisiunčiamas modelis. |
+| FR-3 | Atkurti pasirinktą istorinį run'ą. | Kodo ir duomenų hash'ai, istorinis uv.lock, metrikų palyginimas. |
+| FR-4 | Pateikti paleidžiamą inferencijos konteinerį. | JSON įvestis ir prognozės; netinkama schema atmetama. |
 
-## Nefunkciniai reikalavimai ir KPI
-| ID | Reikalavimas | KPI | Matavimas |
-|---|---|---|---|
-| NFR-1 | Istorinio run'o reprodukcija. | <120 s esant paruoštai aplinkai ir pasiekiamam MLflow/DVC remote. | docs/reproduction.json. |
-| NFR-2 | Deterministinė reprodukcija. | Visų keturių vertinimo metrikų skirtumas ≤1e-12 toje pačioje užrakintoje aplinkoje. | Reprodukcijos scenarijaus palyginimas. |
-| NFR-3 | Trumpas mokymas CPU. | Vieno modelio fit <30 s, GPU nereikalingas. | MLflow train_seconds. |
-| NFR-4 | MLflow duomenų išlikimas. | Po MLflow Pod'o perkūrimo tas pats run_id ir tas pats atsisiųsto artefakto SHA256. | Pod'o perkūrimo patikra. |
-| NFR-5 | Atsekamumas. | 100% pateikiamų run'ų turi git_commit, data_sha256 ir parametrus. | MLflow UI / API. |
-| NFR-6 | Aplinkos atkartojamumas. | Python 3.12; visos Python priklausomybės užrakintos uv.lock. | uv sync --frozen. |
+## Nefunkciniai reikalavimai
 
-Tai tikslai ir patikros, o ne teiginys, kad visi matavimai jau atlikti.
+| ID | KPI | Išmatuota |
+|---|---|---|
+| NFR-1 | Istorinio run'o atkūrimas <120 s, kai Python paketai yra vietiniame uv cache. | 32.685 s. |
+| NFR-2 | Visų keturių atkurtų metrikų skirtumas ≤1e-12. | Visos sutapo. |
+| NFR-3 | Vienas Random Forest fit CPU <30 s. | Didžiausia trukmė 0.059 s. |
+| NFR-4 | Perkūrus MLflow ir PostgreSQL Pod'us išlieka run'o metaduomenys ir artefaktų SHA256. | PASS. |
+| NFR-5 | 100% pateikiamų run'ų turi parametrus, Git bazę, duomenų ir kodo SHA256. | Patikrinti 3 run'ai. |
+| NFR-6 | Python 3.12, priklausomybės iš uv.lock, paleidimas atskiroje aplinkoje. | Fresh-start patikra PASS. |
+| NFR-7 | Inferencijos vaizdas ≤500 MB, vartotojas ne root. | 411.76 MB; UID 10001:10001. |
+| NFR-8 | Publikavimo metu 0 CRITICAL Trivy radinių. | 0; HIGH 44 aptarti security-scan.md. |
 
-## Pirmo vietinio etapo matavimai (2026-10-18)
-- Trys pateikiami run'ai: docs/runs.json; visi užbaigti ir turi Git/data žymas.
-- Istorinio run'o atkūrimas su jo uv.lock: 33.084 s; visos keturios metrikos sutapo.
-- Atkūrimas nepakeitė dabartinių params.yaml, dvc.lock, metrics.json ar models/run.json.
-- MLflow modelio atsisiuntimas ir predict patikrinti; rezultatas sutapo su run'o accuracy.
-- Kubernetes išlikimo KPI dar neišmatuotas. Vietinis MLflow nepakeičia U1-R4.
+Patikros: verification.json, reproduction.json, persistence.json, fresh-start.json,
+image.json, scan-summary.json. Naujas įdiegimas gali trukti ilgiau dėl atsisiuntimų;
+reprodukcijos KPI neapima pirmo Python paketų parsisiuntimo iš interneto.
 
 ## Keitimo istorija
+
 | Versija | Data | Pakeitimas |
 |---|---|---|
-| 1.0 | 2026-10-18 | Problema, FR, pradinis reikalavimų rinkinys. |
-| 1.1 | 2026-10-18 | Užfiksuoti vietinio pipeline'o, atsekamumo ir reprodukcijos matavimai; atskirtos neatliktos patikros. |
+| 1.0 | 2026-10-18 | Problema ir pradinis reikalavimų rinkinys. |
+| 1.1 | 2026-10-19 | Klasterio, saugyklų, reprodukcijos ir konteinerio matavimai. |

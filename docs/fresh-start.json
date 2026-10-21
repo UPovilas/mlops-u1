@@ -1,0 +1,11 @@
+{
+  "clean_project_copy": true,
+  "separate_python_environment": true,
+  "separate_initially_empty_dvc_remote": true,
+  "cluster_setup_idempotent": true,
+  "full_pipeline_passed": true,
+  "cold_cache_restored_from_dvc_remote": true,
+  "run_id": "68d12eb890f2495c96f38ea09a92db3b",
+  "tracking_uri": "http://127.0.0.1:5002",
+  "seconds": 56.914
+}

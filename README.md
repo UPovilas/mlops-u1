@@ -1,76 +1,154 @@
 # Wine MLOps — U1
 
-Individualus projektas: trijų vyno klasių prognozė pagal 13 cheminių požymių.
-Random Forest, CPU; vertinamas atkartojamas eksperimentų srautas.
+Random Forest modelis pagal 13 cheminių požymių priskiria vyną vienai iš trijų klasių.
+Duomenys — `sklearn.datasets.load_wine` (178 įrašai, 142 mokymui, 36 testui).
 
-## Būsena
-Pradinis vietinis etapas. Kubernetes, GHCR, Trivy ir galutinis U1 pateikimas dar ruošiami.
-Mokymosi gidas: [docs/mokymasis.md](docs/mokymasis.md).
+Projektas: DVC pipeline'as `prepare → train → evaluate`, MLflow serveris lokaliame
+kind klasteryje (PostgreSQL + artefaktų PVC) ir inferencijos Docker vaizdas GHCR.
 
-Patikrinta 2026-10-18: prepare → train → evaluate; trys MLflow eksperimentai;
-istorinio run'o atkūrimas su jo užrakinta aplinka per **33.084 s**, nekeičiant dabartinių
-darbo failų; MLflow saugomo modelio atsisiuntimas ir predict. Kai niekas nepasikeitė,
-`dvc repro` praleido visus tris stage'us. Tai vietinio etapo, o ne galutinio U1, patikros.
+- Repozitorija: https://github.com/UPovilas/mlops-u1, pateikimo tag'as `u1-final`
+- Reikalavimai: [docs/requirements.md](docs/requirements.md)
+- Ataskaita: [docs/u1-report.md](docs/u1-report.md)
 
-## Pirmas tavo pratimas
-1. MLflow UI atidaryk wine-u1 eksperimentą; palygink n10-d2 ir n100-dNone run'us.
-2. Skaityk params.yaml, src/prepare.py, src/train.py, src/evaluate.py ir dvc.yaml.
-3. Pakeisk params.yaml n_estimators iš 100 į 30.
-4. Terminale nustatyk MLFLOW_TRACKING_URI ir paleisk `uv run dvc repro`.
-5. Stebėk: prepare praleidžiamas; train ir evaluate persileidžia; MLflow yra naujas run'as.
-6. Grąžink 100 ir dar kartą paleisk dvc repro.
+## Ko reikia
 
-## Aplinka
-Reikia Python 3.12, uv, Git. Aplinką užrakina uv.lock.
+- macOS (arm64) arba Linux, Docker (rekomenduoju ≥8 GB RAM Docker'iui)
+- Git, Python 3.12, [uv](https://docs.astral.sh/uv/), kind 0.33.0, Trivy
+- GHCR publikavimui — GitHub CLI (`gh`)
+
+kubectl atskirai diegti nereikia: `install-tools.sh` parsisiunčia v1.34.11 į `.state/bin/`
+ir patikrina jo SHA256. Visos komandos vykdomos projekto šaknyje.
+
+## Paleidimas nuo nulio
+
+1. Priklausomybės, įrankiai ir duomenys:
+
+   ```bash
+   uv sync --frozen
+   bash scripts/install-tools.sh
+   uv run --frozen python scripts/bootstrap.py
+   ```
+
+   `bootstrap.py` sukuria DVC remote `../mlops-u1-dvc-store`. Jei jis tuščias,
+   CSV sugeneruojamas iš scikit-learn, patikrinamas pagal `.dvc` MD5 ir įkeliamas į remote.
+
+2. Klasteris ir MLflow:
+
+   ```bash
+   bash scripts/cluster.sh up
+   ```
+
+   Sukuriamas kind klasteris `wine-u1`, namespace `wine-u1`, PostgreSQL ir MLflow.
+   Komandą galima kartoti — PVC ir duomenys išlieka.
+
+3. Atskirame terminale paleisti port-forward ir palikti veikti:
+
+   ```bash
+   bash scripts/cluster.sh forward
+   ```
+
+4. Mokymai (trys run'ai: 10 medžių / gylis 2, 50 / 4, 100 / neribotas):
+
+   ```bash
+   export MLFLOW_TRACKING_URI=http://127.0.0.1:5002
+   uv run --frozen python scripts/wait-mlflow.py
+   uv run --frozen python scripts/experiments.py
+   uv run --frozen dvc push
+   ```
+
+Jei projektas gautas ZIP archyvu (be `.git`), prieš 1 žingsnį paleisti `git init -b main`.
+
+## Kur žiūrėti rezultatus
+
+| Kas | Kur |
+|---|---|
+| MLflow UI | http://127.0.0.1:5002, eksperimentas `wine-u1` |
+| Run'ų sąrašas su parametrais ir metrikomis | `docs/runs.json` |
+| Paskutinio `dvc repro` metrikos | `metrics.json` |
+| Reprodukcijos rezultatas | `docs/reproduction.json` |
+| Docker vaizdo dydis ir Trivy | `docs/image-sizes.md`, `docs/security-scan.md`, `docs/trivy.json` |
+| Klasterio būsena | `bash scripts/cluster.sh status` |
+
+## Portai ir prisijungimai
+
+| Paslauga | Adresas | Saugykla |
+|---|---|---|
+| MLflow | `127.0.0.1:5002` → Service `mlflow:5000` | PVC `mlflow-artifacts` (`/mlflow/artifacts`) |
+| PostgreSQL | `postgres:5432`, tik klasterio viduje | PVC `postgres-data` |
+| Kubernetes API | `.state/kubeconfig` | — |
+
+- MLflow be autentifikacijos; port-forward klauso tik `127.0.0.1`.
+- PostgreSQL slaptažodis sugeneruojamas per `cluster.sh up` ir laikomas Kubernetes
+  Secret `postgres` bei `.state/cluster/postgres.env` (failas ne Git'e). Esamai DB jo nekeisti.
+- Ištrynus Pod'ą duomenys išlieka; ištrynus visą kind klasterį — dingsta.
+
+## Pipeline ir parametrai
 
 ```bash
-uv sync --frozen
+uv run --frozen dvc repro
+uv run --frozen dvc status
 ```
 
-Duomenys ir modeliai saugomi DVC remote, kuris vietiniam mokymuisi yra gretimas
-`../mlops-u1-dvc-store` katalogas. Jis turi išlikti arba būti perkeltas kartu su duomenimis.
-Vien Git clone duomenų neatneša: reikia pasiekiamo remote ir `uv run dvc pull`.
+`params.yaml` — padalijimo ir modelio parametrai, `dvc.lock` — jų reikšmės ir failų hash'ai.
+Git saugo kodą ir `.dvc` pointer'ius, DVC — CSV ir `model.pkl`, `uv.lock` — Python versijas.
 
-## Vietinis MLflow (mokymuisi)
-Terminalas 1:
-```bash
-bash scripts/local_mlflow.sh
-```
-Metaduomenys: .state/local/mlflow.db. Artefaktai: .state/local/artifacts.
-UI: http://127.0.0.1:5001. Šiam vietiniam serveriui autentifikacija neįjungta.
-
-Terminalas 2, projekto kataloge:
-```bash
-export MLFLOW_TRACKING_URI=http://127.0.0.1:5001
-uv run dvc pull
-uv run dvc repro
-uv run python scripts/experiments.py
-uv run dvc push
-```
-
-Prieš mokymą source failai turi būti commit'inti. params.yaml gali keistis: visos
-parametrų reikšmės išsaugomos MLflow provenance.json. dvc repro praleidžia
-nepasikeitusius stage'us; naujam run'ui pakeisk parametrą arba naudok --force.
+Pakeitus `train.n_estimators` persileidžia `train` ir `evaluate`, `prepare` praleidžiamas.
+Pakeitus tik `MLFLOW_TRACKING_URI`, DVC nieko neperskaičiuoja — tada `dvc repro --force`.
 
 ## Istorinio run'o atkūrimas
-Pasirink run_id iš MLflow arba docs/runs.json:
+
 ```bash
-uv run python scripts/reproduce.py RUN_ID
+uv run --frozen python scripts/reproduce.py RUN_ID
 ```
-Scenarijus atsisiunčia run'o provenance.json, išpakuoja to meto Git commit į laikiną
-katalogą, per DVC gauna tos versijos duomenis, atkuria parametrus ir vykdo visus tris
-stage'us su istoriniame uv.lock užrakinta aplinka. Dabartinis darbo katalogas ir jo parametrai neperrašomi.
-Naujas run'as susiejamas `reproduces` žyma; metrikos palyginamos, laikas matuojamas.
 
-## Šaltiniai
-- Kurso reikalavimai: https://github.com/VU-MIF-SE/mlops/blob/main/pirma.md
-- Wine duomenys: https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_wine.html
-- MLflow: https://mlflow.org/docs/latest/ml/tracking/quickstart/
-- DVC: https://doc.dvc.org/start
+Kiekvienas run'as MLflow turi `provenance.json` ir `source.tar.gz` (kodas, parametrai,
+duomenys, `uv.lock`). Skriptas patikrina kodo ir duomenų SHA256, laikiname kataloge
+paleidžia tą versiją su jos `uv.lock`, palygina keturias metrikas ir išmatuoja laiką.
+Esami failai nepakeičiami, naujas run'as gauna žymą `reproduces`.
 
-## Likę U1 darbai
-- [ ] kind konfigūracija, Namespace, MLflow Deployment + Service + PVC.
-- [ ] ≥3 run'ai klasterio MLflow; artefaktai išlieka perkūrus Pod'ą.
-- [ ] Dockerfile, GHCR sha-<commit>, vaizdo dydis ir Trivy rezultatas.
-- [ ] docs/u1-report.md, patikrintas paleidimas nuo nulio.
-- [ ] Viešas GitHub repo, u1-final tag, ZIP eMokymams ir gyvas gynimas.
+## Docker vaizdas
+
+```bash
+uv run --frozen python scripts/build-image.py
+uv run --frozen python scripts/scan-image.py
+```
+
+`docker/Dockerfile` — inferencijos CLI: nuskaito JSON, išveda prognozes ir baigia darbą.
+Viduje modelis ir ta pati scikit-learn versija kaip mokant, vartotojas `10001`.
+Be argumentų naudoja `examples/wine.json`; savo failui:
+
+```bash
+docker run --rm --network none -v /absolute/path/input.json:/input.json:ro IMAGE --input /input.json
+```
+
+Publikuotas vaizdas ir jo digest — `docs/publication.json`.
+
+## Patikros ir publikavimas
+
+```bash
+uv run --frozen python scripts/verify.py
+uv run --frozen python scripts/verify-persistence.py
+uv run --frozen python scripts/verify-fresh-start.py
+uv run --frozen python scripts/reports.py
+```
+
+- `verify.py` — DVC, run'ai klasteryje, modelio parsisiuntimas, reprodukcija, konteineris
+- `verify-persistence.py` — perkuria MLflow ir PostgreSQL Pod'us ir lygina run'o duomenis
+- `verify-fresh-start.py` — pilnas paleidimas švarioje projekto kopijoje su tuščiu DVC remote
+- `reports.py` — atnaujina `docs/` ataskaitas iš patikrų rezultatų
+
+`bash scripts/publish.sh` (tik su švaria Git būsena) pakartoja mokymus, sukuria ir
+nuskenuoja `sha-<commit>` vaizdą ir įkelia jį į GHCR. `scripts/package.py` sukuria
+`dist/wine-u1.zip` be aplinkos, cache ir prisijungimų.
+
+## Struktūra
+
+```
+src/       prepare, train, evaluate, predict
+scripts/   klasteris, eksperimentai, reprodukcija, patikros, publikavimas
+docker/    inferencijos ir MLflow Dockerfile'ai
+k8s/       kind konfigūracija, namespace, PostgreSQL, MLflow
+docs/      reikalavimai, ataskaita, matavimai
+```
+
+Naudota kurso medžiaga: [docs/sources.md](docs/sources.md).

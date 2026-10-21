@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mlflow-artifacts
+  namespace: wine-u1
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+  namespace: wine-u1
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mlflow
+  template:
+    metadata:
+      labels:
+        app: mlflow
+    spec:
+      securityContext:
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      containers:
+        - name: mlflow
+          image: wine-u1-mlflow:3.15.2
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: postgres
+          env:
+            - name: MLFLOW_SERVER_ENABLE_JOB_EXECUTION
+              value: "false"
+            - name: MLFLOW_BACKEND_STORE_URI
+              value: postgresql+psycopg2://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)
+          args:
+            - server
+            - --backend-store-uri
+            - $(MLFLOW_BACKEND_STORE_URI)
+            - --artifacts-destination
+            - /mlflow/artifacts
+            - --host
+            - 0.0.0.0
+            - --port
+            - "5000"
+            - --workers
+            - "1"
+            - --allowed-hosts
+            - localhost,localhost:*,127.0.0.1,127.0.0.1:*,mlflow,mlflow:*,mlflow.wine-u1.svc.cluster.local,mlflow.wine-u1.svc.cluster.local:*
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: 250m
+              memory: 384Mi
+            limits:
+              cpu: "2"
+              memory: 1536Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+              httpHeaders:
+                - name: Host
+                  value: localhost:5000
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+              httpHeaders:
+                - name: Host
+                  value: localhost:5000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - name: artifacts
+              mountPath: /mlflow/artifacts
+      volumes:
+        - name: artifacts
+          persistentVolumeClaim:
+            claimName: mlflow-artifacts
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow
+  namespace: wine-u1
+spec:
+  selector:
+    app: mlflow
+  ports:
+    - port: 5000
+      targetPort: 5000

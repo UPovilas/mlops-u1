@@ -1,0 +1,12 @@
+**
+!docker/
+!docker/Dockerfile
+!docker/Dockerfile.mlflow
+!docker/requirements-inference.txt
+!docker/requirements-mlflow.txt
+!src/
+!src/predict.py
+!models/
+!models/model.pkl
+!examples/
+!examples/wine.json

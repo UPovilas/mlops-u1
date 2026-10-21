@@ -1,0 +1,44 @@
+{
+  "tracking_uri": "http://127.0.0.1:5002",
+  "run_id": "010e687f4c9146e9bd9ccd2b76e30657",
+  "pods": {
+    "mlflow": {
+      "before": "7c339a02-4703-4e17-bdb8-282c0662653d",
+      "after": "cd614944-ea9c-4b6f-abbd-aea3a5c07dd4"
+    },
+    "postgres": {
+      "before": "85e994c1-af15-4b94-a668-6e40916ea8a5",
+      "after": "b06bd28c-5ea2-46b5-a235-e1e4e00ebceb"
+    }
+  },
+  "metadata_and_artifacts_unchanged": true,
+  "artifacts": {
+    "run_id": "010e687f4c9146e9bd9ccd2b76e30657",
+    "params": {
+      "split.test_size": "0.2",
+      "split.random_state": "42",
+      "train.n_estimators": "10",
+      "train.max_depth": "2",
+      "train.random_state": "42"
+    },
+    "metrics": {
+      "train_seconds": 0.016712500000721775,
+      "accuracy": 0.9722222222222222,
+      "f1_weighted": 0.9722633744855966,
+      "precision_weighted": 0.9743589743589745,
+      "recall_weighted": 0.9722222222222222
+    },
+    "provenance_sha256": "6f72a73de0447308731fed79bdc5c8615c73923013ef166be8ad8079d57c9a59",
+    "source_sha256": "b8fa8cc724d4dc402dc0135d48b7ff6e15fb2c3d7bd45136e4e54b736da71967",
+    "model_files": {
+      "python_env.yaml": "c5d26348f93b918f4b375173369980971800c581db8b29f807e862e3586290d8",
+      "requirements.txt": "9e7ec302cc51994ba4fff05efce41c78e318fc906d7e993766b3d6bfb9ae4574",
+      "MLmodel": "c5c53ab5f6a46da9a2e2ced07285b306bda1388ef98a7af302e4c8d203de7db8",
+      "serving_input_example.json": "0a296e98a4a9c11bfc70f3c913c1cea19a5fc8d7fb9d31409b7f9b275c4a62e1",
+      "registered_model_meta": "f6f1956a8fc1e03c255aeb1c2a61d3efbc436b068d20cb34ff21e8ff74f1fc15",
+      "input_example.json": "0835876853c96ede8379016b3f1b90a5b70f2b0291d6d195b3ad69a6d7b965cb",
+      "conda.yaml": "ee166119dc177c03d604d9114edc87c755759160738e56bffeceb85a693b3e88",
+      "model.skops": "f8588870bac98208e8dacef732f81d009d95c61d14ee7488f95e72f14f184dba"
+    }
+  }
+}

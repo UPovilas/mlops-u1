@@ -1,5 +1,6 @@
 {
   "experiment": "wine-u1",
-  "git_commit": "cf98b9ba281e0681d100fa27213328d3712d717f",
-  "run_id": "64c80cf25f9c4f03b73f2a12a7df6316"
+  "git_commit": "5c9a6333a4aec092ae61e54eb97d829252dd6f8b",
+  "run_id": "ef6cb5a6323f4ed6af87ee604b0426d2",
+  "source_sha256": "c3e2b8057da8ffce6c0ee80a4aa1755a4cd88ed1c5fc4da1f046c10ca159376e"
 }

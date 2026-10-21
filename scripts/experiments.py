@@ -1,7 +1,7 @@
 """Three explicit hyperparameter settings, each rebuilt and logged to the selected server."""
 import json
-import os
 import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -15,9 +15,10 @@ try:
     for count, depth in [(10, 2), (50, 4), (100, None)]:
         cfg["train"].update(n_estimators=count, max_depth=depth)
         path.write_text(yaml.safe_dump(cfg, sort_keys=False))
-        subprocess.run([str(Path(os.sys.executable).with_name("dvc")), "repro", "--force"], cwd=root, check=True)
+        subprocess.run([str(Path(sys.executable).with_name("dvc")), "repro", "--force"], cwd=root, check=True)
         results.append({**json.loads((root / "models/run.json").read_text()), "train": dict(cfg["train"]), "metrics": json.loads((root / "metrics.json").read_text())})
 finally:
     path.write_text(original)
+subprocess.run([str(Path(sys.executable).with_name("dvc")), "repro"], cwd=root, check=True)
 (root / "docs/runs.json").write_text(json.dumps(results, indent=2) + "\n")
 print("Saved three experiment results to docs/runs.json")

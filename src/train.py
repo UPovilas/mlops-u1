@@ -1,6 +1,8 @@
 """Stage 2: train, save the model, and log provenance and artifacts to MLflow."""
 import os
+import tempfile
 import time
+from pathlib import Path
 
 import joblib
 import mlflow
@@ -9,13 +11,14 @@ import pandas as pd
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
 
-from common import ROOT, connect_tracking, params, sha256, source_commit, write_json
+from common import ROOT, connect_tracking, params, sha256, source_commit, source_snapshot, write_json
 
 
 def main():
     uri = connect_tracking()
     cfg = params()
     commit = source_commit()
+    source, source_hash, dirty = source_snapshot()
     experiment = os.environ.get("MLFLOW_EXPERIMENT_NAME", "wine-u1")
     mlflow.set_experiment(experiment)
     train = pd.read_csv(ROOT / "data/processed/train.csv")
@@ -25,10 +28,12 @@ def main():
         "params": cfg,
         "data_sha256": sha256(ROOT / "data/raw/wine.csv"),
         "sklearn_version": sklearn.__version__,
+        "source_sha256": source_hash,
+        "git_dirty": dirty,
     }
     with mlflow.start_run(run_name=f"rf-n{cfg['train']['n_estimators']}-d{cfg['train']['max_depth']}") as run:
         mlflow.log_params({f"{section}.{key}": value for section, values in cfg.items() for key, value in values.items()})
-        mlflow.set_tags({"git_commit": commit, "data_sha256": provenance["data_sha256"], "model_family": "RandomForestClassifier"})
+        mlflow.set_tags({"git_commit": commit, "data_sha256": provenance["data_sha256"], "source_sha256": source_hash, "git_dirty": str(dirty).lower(), "model_family": "RandomForestClassifier"})
         if os.environ.get("REPRODUCES_RUN_ID"):
             mlflow.set_tag("reproduces", os.environ["REPRODUCES_RUN_ID"])
         mlflow.log_input(mlflow.data.from_pandas(train, targets="target", name="wine-train"), context="training")
@@ -40,12 +45,15 @@ def main():
         joblib.dump(model, ROOT / "models/model.pkl")
         mlflow.sklearn.log_model(
             model, name="model", input_example=x.head(3),
-            # This tree was just trained here, not loaded from an external model file.
             skops_trusted_types=["sklearn.tree._tree.Tree"],
             pip_requirements=[f"scikit-learn=={sklearn.__version__}", f"pandas=={pd.__version__}", f"joblib=={joblib.__version__}"],
         )
         mlflow.log_dict(provenance, "provenance.json")
-        write_json(ROOT / "models/run.json", {"run_id": run.info.run_id, "experiment": experiment, "git_commit": commit})
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "source.tar.gz"
+            archive.write_bytes(source)
+            mlflow.log_artifact(str(archive))
+        write_json(ROOT / "models/run.json", {"run_id": run.info.run_id, "experiment": experiment, "git_commit": commit, "source_sha256": source_hash})
         print(f"train: run_id={run.info.run_id}; tracking={uri}")
 
 

@@ -1,0 +1,16 @@
+{
+  "image": "wine-u1-inference:worktree-c3e2b8057da8",
+  "image_id": "sha256:db877cb80c05bdfa4ba82268503c5e5e445067682794e4995750147e62590a40",
+  "architecture": "arm64",
+  "size_bytes": 411763692,
+  "user": "10001:10001",
+  "git_commit": "5c9a6333a4aec092ae61e54eb97d829252dd6f8b",
+  "git_dirty": true,
+  "source_sha256": "c3e2b8057da8ffce6c0ee80a4aa1755a4cd88ed1c5fc4da1f046c10ca159376e",
+  "model_sha256": "223689954b6d8aa42b477046167b5aa0a0c5cb26bbfc43fffb226692d9cef0be",
+  "predictions": [
+    0,
+    2,
+    0
+  ]
+}
