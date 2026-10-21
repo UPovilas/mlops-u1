@@ -34,4 +34,5 @@ reprodukcijos KPI neapima pirmo Python paketų parsisiuntimo iš interneto.
 | Versija | Data | Pakeitimas |
 |---|---|---|
 | 1.0 | 2026-10-18 | Problema ir pradinis reikalavimų rinkinys. |
-| 1.1 | 2026-10-19 | Klasterio, saugyklų, reprodukcijos ir konteinerio matavimai. |
+| 1.1 | 2026-10-18 | Pirmi vietinio pipeline'o ir reprodukcijos matavimai. |
+| 1.1 | 2026-10-21 | Papildyti klasterio, saugyklų ir konteinerio matavimai. |

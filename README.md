@@ -128,6 +128,7 @@ Publikuotas vaizdas ir jo digest — `docs/publication.json`.
 ```bash
 uv run --frozen python scripts/verify.py
 uv run --frozen python scripts/verify-persistence.py
+uv run --frozen python scripts/package.py
 uv run --frozen python scripts/verify-fresh-start.py
 uv run --frozen python scripts/reports.py
 ```
