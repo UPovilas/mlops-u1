@@ -21,6 +21,8 @@ def main():
     source, source_hash, dirty = source_snapshot()
     experiment = os.environ.get("MLFLOW_EXPERIMENT_NAME", "wine-u1")
     mlflow.set_experiment(experiment)
+    mlflow.enable_system_metrics_logging()
+    mlflow.set_system_metrics_sampling_interval(1)
     train = pd.read_csv(ROOT / "data/processed/train.csv")
     x, y = train.drop(columns="target").astype("float64"), train["target"]
     provenance = {
@@ -33,7 +35,7 @@ def main():
     }
     with mlflow.start_run(run_name=f"rf-n{cfg['train']['n_estimators']}-d{cfg['train']['max_depth']}") as run:
         mlflow.log_params({f"{section}.{key}": value for section, values in cfg.items() for key, value in values.items()})
-        mlflow.set_tags({"git_commit": commit, "data_sha256": provenance["data_sha256"], "source_sha256": source_hash, "git_dirty": str(dirty).lower(), "model_family": "RandomForestClassifier"})
+        mlflow.set_tags({"git_commit": commit, "data_sha256": provenance["data_sha256"], "source_sha256": source_hash, "git_dirty": str(dirty).lower(), "model_family": "RandomForestClassifier", "seed.split": str(cfg["split"]["random_state"]), "seed.train": str(cfg["train"]["random_state"])})
         if os.environ.get("REPRODUCES_RUN_ID"):
             mlflow.set_tag("reproduces", os.environ["REPRODUCES_RUN_ID"])
         mlflow.log_input(mlflow.data.from_pandas(train, targets="target", name="wine-train"), context="training")
