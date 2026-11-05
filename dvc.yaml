@@ -22,6 +22,7 @@ stages:
       - train.n_estimators
       - train.max_depth
       - train.random_state
+      - curve.steps
     outs:
       - models/model.pkl
       - models/run.json:
