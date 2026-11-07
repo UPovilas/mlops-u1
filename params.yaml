@@ -7,3 +7,13 @@ train:
   random_state: 42
 curve:
   steps: 10
+hpo:
+  n_estimators:
+    min: 10
+    max: 50
+    step: 10
+  max_depth:
+    min: 1
+    max: 7
+    step: 1
+  n_trials: 14
