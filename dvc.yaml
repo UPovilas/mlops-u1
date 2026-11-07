@@ -11,6 +11,18 @@ stages:
     outs:
       - data/processed/train.csv
       - data/processed/test.csv
+  hpo:
+    cmd: python src/hpo.py
+    deps:
+      - src/common.py
+      - src/hpo.py
+      - data/processed/train.csv
+    params:
+      - hpo
+      - train.random_state
+    outs:
+      - models/best_params.json:
+          cache: false
   train:
     cmd: python src/train.py
     deps:
@@ -18,9 +30,8 @@ stages:
       - src/train.py
       - data/raw/wine.csv
       - data/processed/train.csv
+      - models/best_params.json
     params:
-      - train.n_estimators
-      - train.max_depth
       - train.random_state
       - curve.steps
     outs:
@@ -38,3 +49,10 @@ stages:
     metrics:
       - metrics.json:
           cache: false
+  register:
+    cmd: python src/register.py
+    deps:
+      - src/common.py
+      - src/register.py
+      - models/run.json
+      - metrics.json

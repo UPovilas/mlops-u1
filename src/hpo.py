@@ -6,7 +6,7 @@ import optuna
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
-from common import ROOT, connect_tracking, params, source_commit
+from common import ROOT, connect_tracking, params, source_commit, write_json
 
 
 def main():
@@ -37,6 +37,7 @@ def main():
         study.optimize(objective, n_trials=hpo["n_trials"])
         mlflow.log_params(study.best_params)
         mlflow.log_metric("best_oob_score", study.best_value)
+        write_json(ROOT / "models/best_params.json", study.best_params)
         print(f"hpo: best={study.best_value:.4f} params={study.best_params}")
 
 

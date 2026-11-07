@@ -10,6 +10,7 @@ import mlflow.sklearn
 import pandas as pd
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
+import json
 
 from common import ROOT, connect_tracking, params, sha256, source_commit, source_snapshot, write_json
 
@@ -33,16 +34,18 @@ def main():
         "source_sha256": source_hash,
         "git_dirty": dirty,
     }
-    with mlflow.start_run(run_name=f"rf-n{cfg['train']['n_estimators']}-d{cfg['train']['max_depth']}") as run:
+    best_params = json.loads((ROOT / "models/best_params.json").read_text())
+    with mlflow.start_run(run_name=f"rf-n{best_params['n_estimators']}-d{best_params['max_depth']}") as run:
         mlflow.log_params({f"{section}.{key}": value for section, values in cfg.items() for key, value in values.items()})
+        mlflow.log_params({f"best_{key}": value for key, value in best_params.items()})
         mlflow.set_tags({"git_commit": commit, "data_sha256": provenance["data_sha256"], "source_sha256": source_hash, "git_dirty": str(dirty).lower(), "model_family": "RandomForestClassifier", "seed.split": str(cfg["split"]["random_state"]), "seed.train": str(cfg["train"]["random_state"])})
         if os.environ.get("REPRODUCES_RUN_ID"):
             mlflow.set_tag("reproduces", os.environ["REPRODUCES_RUN_ID"])
         mlflow.log_input(mlflow.data.from_pandas(train, targets="target", name="wine-train"), context="training")
         start = time.perf_counter()
-        model = RandomForestClassifier(**cfg["train"], n_jobs=1, warm_start=True, oob_score=True)
-        model.set_params(n_estimators=cfg["curve"]["steps"])
-        for step in range(cfg["curve"]["steps"], cfg["train"]["n_estimators"] + 1, cfg["curve"]["steps"]):
+        model = RandomForestClassifier(**best_params, random_state=cfg["train"]["random_state"], n_jobs=1, warm_start=True, oob_score=True)
+        model.set_params(n_estimators=best_params["n_estimators"])
+        for step in range(cfg["curve"]["steps"], best_params["n_estimators"] + 1, cfg["curve"]["steps"]):
             model.set_params(n_estimators=step)
             model.fit(x, y)
             mlflow.log_metric("oob_score", model.oob_score_, step=step)

@@ -39,28 +39,30 @@ stages:
       hash: md5
       md5: 2925c4a8cd201c79d97d3d283429ef23
       size: 12261
+    - path: models/best_params.json
+      hash: md5
+      md5: 4682505dfa97aa7754b1fda78abdeaee
+      size: 43
     - path: src/common.py
       hash: md5
       md5: c5e06e9ec6c2bdd5011571230105a948
       size: 2636
     - path: src/train.py
       hash: md5
-      md5: 0f1af2f6b454a60c3c04a80f37472de0
-      size: 3308
+      md5: a17262f51a165b965f09ca2882805b38
+      size: 3530
     params:
       params.yaml:
         curve.steps: 10
-        train.max_depth:
-        train.n_estimators: 100
         train.random_state: 42
     outs:
     - path: models/model.pkl
       hash: md5
-      md5: 57345af86846ef29450fccb560cbd1e0
-      size: 215526
+      md5: eae7f820c7e695e09310e28052da821f
+      size: 96230
     - path: models/run.json
       hash: md5
-      md5: 45272a8d60c475d729569f35a70459f9
+      md5: 4085925aa5669c853744c71cd59a0bea
       size: 225
   evaluate:
     cmd: python src/evaluate.py
@@ -71,11 +73,11 @@ stages:
       size: 2615
     - path: models/model.pkl
       hash: md5
-      md5: 57345af86846ef29450fccb560cbd1e0
-      size: 215526
+      md5: eae7f820c7e695e09310e28052da821f
+      size: 96230
     - path: models/run.json
       hash: md5
-      md5: 45272a8d60c475d729569f35a70459f9
+      md5: 4085925aa5669c853744c71cd59a0bea
       size: 225
     - path: src/common.py
       hash: md5
@@ -90,3 +92,55 @@ stages:
       hash: md5
       md5: b013c10c869a7a81a382081b5a6c630c
       size: 99
+  hpo:
+    cmd: python src/hpo.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 5ac769d42b290244ccdd91b8a01dddca
+      size: 9823
+    - path: src/common.py
+      hash: md5
+      md5: c5e06e9ec6c2bdd5011571230105a948
+      size: 2636
+    - path: src/hpo.py
+      hash: md5
+      md5: 6b628f1a379396eededdbdaad99f9d88
+      size: 2053
+    params:
+      params.yaml:
+        hpo:
+          n_estimators:
+            min: 10
+            max: 50
+            step: 10
+          max_depth:
+            min: 1
+            max: 7
+            step: 1
+          n_trials: 14
+        train.random_state: 42
+    outs:
+    - path: models/best_params.json
+      hash: md5
+      md5: 4682505dfa97aa7754b1fda78abdeaee
+      size: 43
+  register:
+    cmd: python src/register.py
+    deps:
+    - path: metrics.json
+      hash: md5
+      md5: b013c10c869a7a81a382081b5a6c630c
+      size: 99
+    - path: models/run.json
+      hash: md5
+      md5: 4085925aa5669c853744c71cd59a0bea
+      size: 225
+    - path: src/common.py
+      hash: md5
+      md5: c5e06e9ec6c2bdd5011571230105a948
+      size: 2636
+    - path: src/register.py
+      hash: md5
+      md5: eecf12aedecbf4ddac4681d5895667fb
+      size: 1408
