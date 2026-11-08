@@ -19,10 +19,11 @@ ENV PATH="/opt/venv/bin:$PATH" \
 WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 COPY src/predict.py /app/src/predict.py
-COPY models/model.pkl /app/models/model.pkl
+COPY src/serve.py /app/src/serve.py
+COPY src/common.py /app/src/common.py
 COPY examples/wine.json /app/examples/wine.json
 RUN /usr/local/bin/python -m pip uninstall -y pip \
     && rm -rf /usr/local/lib/python3.12/ensurepip \
     && useradd --uid 10001 --create-home appuser
 USER 10001:10001
-ENTRYPOINT ["python", "/app/src/predict.py"]
+ENTRYPOINT ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "serve:app", "--app-dir", "/app/src"]
