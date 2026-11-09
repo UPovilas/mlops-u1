@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: train-config
+  namespace: wine-u1
+data:
+  MLFLOW_TRACKING_URI: http://mlflow:5000
+  MLFLOW_EXPERIMENT_NAME: wine-u1

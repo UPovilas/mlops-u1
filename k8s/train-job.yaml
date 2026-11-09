@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wine-train
+  namespace: wine-u1
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: train
+          image: wine-train:dev
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: train-config
+            - secretRef:
+                name: mlflow-auth
+          volumeMounts:
+            - name: train-params
+              mountPath: /app/params.yaml
+              subPath: params.yaml
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+      volumes:
+        - name: train-params
+          configMap:
+            name: train-params

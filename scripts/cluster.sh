@@ -34,6 +34,12 @@ PY
       fi
       k create secret generic postgres --from-env-file=.state/cluster/postgres.env
     fi
+    if ! k get secret mlflow-auth >/dev/null 2>&1; then
+      if [ ! -f .state/cluster/mlflow-auth.env ]; then
+        python3 -c "import os,secrets,pathlib; p=pathlib.Path('.state/cluster/mlflow-auth.env'); p.write_text('MLFLOW_TRACKING_USERNAME=trainer\\nMLFLOW_TRACKING_PASSWORD='+secrets.token_urlsafe(24)+'\\n'); os.chmod(p,0o600)"
+      fi
+      k create secret generic mlflow-auth --from-env-file=.state/cluster/mlflow-auth.env
+    fi
     k apply -f k8s/postgres.yaml
     k rollout status deployment/postgres --timeout=180s
     k apply -f k8s/mlflow.yaml
@@ -48,11 +54,20 @@ PY
       sleep 2
     done
     ;;
+  train)
+    # params.yaml (Git) -> ConfigMap train-params -> mounted into the Job as /app/params.yaml
+    k create configmap train-params --from-file=params.yaml --dry-run=client -o yaml | k apply -f -
+    k apply -f k8s/train-config.yaml
+    k delete job wine-train --ignore-not-found
+    k apply -f k8s/train-job.yaml
+    k wait --for=condition=complete job/wine-train --timeout=600s
+    k logs job/wine-train | grep -E '^(hpo|register):'
+    ;;
   status)
     k get pods,deployments,services,pvc
     ;;
   *)
-    echo 'Usage: bash scripts/cluster.sh {up|forward|status}' >&2
+    echo 'Usage: bash scripts/cluster.sh {up|forward|train|status}' >&2
     exit 2
     ;;
 esac

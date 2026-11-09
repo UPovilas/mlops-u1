@@ -10,3 +10,11 @@
 !models/model.pkl
 !examples/
 !examples/wine.json
+!docker/Dockerfile.train
+!pyproject.toml
+!uv.lock
+!.python-version
+!params.yaml
+!dvc.yaml
+!data/raw/wine.csv
+!data/raw/wine.csv.dvc
