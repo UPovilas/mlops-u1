@@ -1,0 +1,35 @@
+name: cd
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    env:
+      KUBECONFIG: ${{ github.workspace }}/.state/kubeconfig
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cluster access
+        run: |
+          mkdir -p .state/cluster
+          kind export kubeconfig --name wine-u1 --kubeconfig .state/kubeconfig
+          bash scripts/install-tools.sh
+      - name: Train in cluster (Job) + quality gate
+        run: |
+          docker build -f docker/Dockerfile.train --build-arg GIT_COMMIT="$GITHUB_SHA" -t wine-train:dev .
+          kind load docker-image wine-train:dev --name wine-u1
+          bash scripts/cluster.sh train
+      - name: Deploy API with new @champion
+        run: |
+          TAG="sha-${GITHUB_SHA::12}"
+          docker build -f docker/Dockerfile --build-arg GIT_COMMIT="$GITHUB_SHA" -t "wine-api:$TAG" .
+          kind load docker-image "wine-api:$TAG" --name wine-u1
+          K=".state/bin/kubectl -n wine-u1"
+          $K set image deployment/wine-api api="wine-api:$TAG"
+          $K rollout status deployment/wine-api --timeout=180s

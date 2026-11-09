@@ -15,4 +15,4 @@ COPY data/raw/wine.csv data/raw/wine.csv.dvc data/raw/
 COPY src/ src/
 RUN useradd --uid 10001 --create-home trainer && mkdir -p models data/processed && chown -R 10001:10001 /app
 USER 10001:10001
-CMD ["sh", "-c", "python src/prepare.py && python src/hpo.py && python src/train.py && python src/evaluate.py && python src/register.py"]
+CMD ["sh", "-c", "python src/prepare.py && python src/hpo.py && python src/train.py && python src/evaluate.py && python src/quality_gate.py && python src/register.py"]

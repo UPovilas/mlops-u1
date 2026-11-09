@@ -15,3 +15,5 @@ hpo:
     max: 7
     step: 1
   n_trials: 10
+gate:
+  min_accuracy: 0.85

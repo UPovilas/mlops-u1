@@ -50,9 +50,12 @@ stages:
       - metrics.json:
           cache: false
   register:
-    cmd: python src/register.py
+    cmd: python src/quality_gate.py && python src/register.py
     deps:
       - src/common.py
+      - src/quality_gate.py
       - src/register.py
       - models/run.json
       - metrics.json
+    params:
+      - gate.min_accuracy

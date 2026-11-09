@@ -60,8 +60,13 @@ PY
     k apply -f k8s/train-config.yaml
     k delete job wine-train --ignore-not-found
     k apply -f k8s/train-job.yaml
-    k wait --for=condition=complete job/wine-train --timeout=600s
-    k logs job/wine-train | grep -E '^(hpo|register):'
+    for _ in $(seq 1 120); do
+      state=$(k get job wine-train -o jsonpath='{.status.conditions[?(@.status=="True")].type}')
+      case "$state" in *Complete*|*Failed*) break ;; esac
+      sleep 5
+    done
+    k logs job/wine-train | grep -E '^(hpo|gate|register):' || true
+    case "$state" in *Complete*) ;; *) echo "train job: ${state:-timeout}" >&2; exit 1 ;; esac
     ;;
   status)
     k get pods,deployments,services,pvc
