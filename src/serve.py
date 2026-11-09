@@ -10,10 +10,8 @@ from common import connect_tracking
 
 connect_tracking()
 
-# TODO(tu): iš kurio env kintamojo imti modelio adresą? Numatyta reikšmė — champion URI iš Z-04
 MODEL_URI = os.environ.get("MODEL_URI", "models:/wine-classifier@champion")
 
-# TODO(tu): pakrauk modelį (vieną kartą, čia, modulio lygyje). Jei MLflow nepasiekiamas — tegul nulūžta (variantas a)
 model = mlflow.sklearn.load_model(MODEL_URI)
 
 COLUMNS = list(model.feature_names_in_)
@@ -35,5 +33,4 @@ def predict(records: list[dict]):
         raise HTTPException(422, "Feature values must be numeric.")
     if not np.isfinite(features.to_numpy()).all():
         raise HTTPException(422, "Feature values must be finite and not missing.")
-    # TODO(tu): grąžink {"predictions": [...]} — kaip predict.py paskutinėje eilutėje
     return {"predictions": model.predict(features).tolist()}

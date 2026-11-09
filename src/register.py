@@ -16,7 +16,6 @@ def main():
     run_id = json.loads((ROOT / "models/run.json").read_text())["run_id"]
     new_score = json.loads((ROOT / "metrics.json").read_text())[METRIC]
 
-    # TODO(tu): užregistruok šio run'o modelį vardu MODEL_NAME -> su model uri, kuriame yra run_id ir relative_path="model" — užuomina: client.create_registered_model(...), client.create_model_version(...)
     version = mlflow.register_model(f"runs:/{run_id}/model", MODEL_NAME)
 
     try:
@@ -25,7 +24,6 @@ def main():
     except mlflow.exceptions.MlflowException:
         champion_score = None  # dar nėra champion
 
-    # TODO(tu): taisyklė (b) — kada kviesti client.set_registered_model_alias(MODEL_NAME, ALIAS, version.version)?
     if champion_score is None or new_score >= champion_score:
         client.set_registered_model_alias(MODEL_NAME, ALIAS, version.version)
 

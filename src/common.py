@@ -1,6 +1,6 @@
 """Small shared helpers. Paths are relative to this project, never the shell cwd."""
-import hashlib
 import gzip
+import hashlib
 import io
 import json
 import os

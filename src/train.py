@@ -1,4 +1,5 @@
 """Stage 2: train, save the model, and log provenance and artifacts to MLflow."""
+import json
 import os
 import tempfile
 import time
@@ -10,9 +11,16 @@ import mlflow.sklearn
 import pandas as pd
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
-import json
 
-from common import ROOT, connect_tracking, params, sha256, source_commit, source_snapshot, write_json
+from common import (
+    ROOT,
+    connect_tracking,
+    params,
+    sha256,
+    source_commit,
+    source_snapshot,
+    write_json,
+)
 
 
 def main():
