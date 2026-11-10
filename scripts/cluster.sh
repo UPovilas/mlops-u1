@@ -45,6 +45,11 @@ PY
     k apply -f k8s/mlflow.yaml
     k rollout restart deployment/mlflow
     k rollout status deployment/mlflow --timeout=180s
+    # metrics-server (kube-system): HPA needs pod CPU; kind kubelet certs are self-signed
+    "$KUBECTL" --kubeconfig "$KUBECONFIG_FILE" apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.2/components.yaml
+    if ! "$KUBECTL" --kubeconfig "$KUBECONFIG_FILE" -n kube-system get deployment metrics-server -o jsonpath='{.spec.template.spec.containers[0].args}' | grep -q kubelet-insecure-tls; then
+      "$KUBECTL" --kubeconfig "$KUBECONFIG_FILE" -n kube-system patch deployment metrics-server --type=json -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+    fi
     k get deployments,services,pvc
     ;;
   forward)
@@ -68,11 +73,20 @@ PY
     k logs job/wine-train | grep -E '^(hpo|gate|register):' || true
     case "$state" in *Complete*) ;; *) echo "train job: ${state:-timeout}" >&2; exit 1 ;; esac
     ;;
+  load)
+    # Locust inside the cluster -> Service wine-api spreads requests over all HPA pods
+    k create configmap locust-files --from-file=scripts/locustfile.py --from-file=examples/wine.json --dry-run=client -o yaml | k apply -f -
+    k delete job wine-load --ignore-not-found
+    k apply -f k8s/locust-job.yaml
+    k wait --for=condition=complete job/wine-load --timeout=300s || true
+    k logs job/wine-load | tail -12
+    k get hpa wine-api
+    ;;
   status)
     k get pods,deployments,services,pvc
     ;;
   *)
-    echo 'Usage: bash scripts/cluster.sh {up|forward|train|status}' >&2
+    echo 'Usage: bash scripts/cluster.sh {up|forward|train|load|status}' >&2
     exit 2
     ;;
 esac

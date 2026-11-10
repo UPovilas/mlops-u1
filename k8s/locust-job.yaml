@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wine-load
+  namespace: wine-u1
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: locust
+          image: locustio/locust:2.47.0
+          imagePullPolicy: IfNotPresent
+          workingDir: /mnt/locust
+          args:
+            - -f
+            - scripts/locustfile.py
+            - --headless
+            - -u
+            - "40"
+            - -r
+            - "10"
+            - -t
+            - 120s
+            - --only-summary
+            - -H
+            - http://wine-api
+          volumeMounts:
+            - name: locust-files
+              mountPath: /mnt/locust/scripts/locustfile.py
+              subPath: locustfile.py
+            - name: locust-files
+              mountPath: /mnt/locust/examples/wine.json
+              subPath: wine.json
+      volumes:
+        - name: locust-files
+          configMap:
+            name: locust-files

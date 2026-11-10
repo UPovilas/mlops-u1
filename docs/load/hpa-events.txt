@@ -1,0 +1,6 @@
+Events:
+  Type    Reason             Age                  From                       Message
+  ----    ------             ----                 ----                       -------
+  Normal  SuccessfulRescale  15m                  horizontal-pod-autoscaler  New size: 2; reason: cpu resource utilization (percentage of request) above target
+  Normal  SuccessfulRescale  8m25s                horizontal-pod-autoscaler  New size: 1; reason: All metrics below target
+  Normal  SuccessfulRescale  4m25s (x2 over 15m)  horizontal-pod-autoscaler  New size: 3; reason: cpu resource utilization (percentage of request) above target
